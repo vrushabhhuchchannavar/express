@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const errorHandler = require('../middleware/errorclass');
 const User = require('../models/userSchema');
-const validate = require('../validation/uservalidation');
+const { validateUser, validatelogin} = require('../validation/uservalidation');
 
 // exports.getAll = async(req, res) => {
 //     const users = await User.find();
@@ -43,10 +43,14 @@ exports.create = async(req, res, next) => {
             password: req.body.password
         } 
 
-        await validate.validateUSer(params);
+        const validate = await validateUser.validate(params);
+        if(validate.error) {
+            return next(new errorHandler("user credentials are invalid.", 400));
+        }
+        
         let existUser = await User.findOne({ email: params.email });
         if(existUser) {
-            return next(new errorHandler("user already exists.", 401));
+            return next(new errorHandler("user already exists.", 400));
             // res.status(401).send({ error: true, message: 'user alresdy exists' })
         }
        
@@ -65,10 +69,7 @@ exports.create = async(req, res, next) => {
         res.status(201)
         .cookie("token", token, { 
             httpOnly: true, 
-            maxAge: 15 * 60 * 1000, 
-            sameSite : process.env.NODE_ENV === "Development" ? "lax" : "none",
-            secure: process.env.NODE_ENV === "Development" ? false : true,
-        })
+            maxAge: 15 * 60 * 1000 })
         .send({ error: false, message: 'registered successfully', result: user });
         
 
@@ -82,27 +83,29 @@ exports.login = async(req, res, next) => {
     try {
         let { email, password } = req.body;
 
-        await validate.validatelogin({ email, password });
+        const validate = await validatelogin.validate({ email, password });
+        if(validate.error) {
+            return next(new errorHandler("credentials are invalid.", 400));
+        }
+
         let user = await User.findOne({ email }).select("+password");
         
         if(!user) {
-            return next(new errorHandler('invalid email or password', 404));
+            return next(new errorHandler('invalid email or password', 400));
             // res.status(404).send({error: true, message: 'invalid email or password'});
         }
         
         const matchpass = bcrypt.compare(password, user.password);
         
         if(!matchpass) {
-            return next(new errorHandler('does not match the password', 404));
+            return next(new errorHandler('does not match the password', 401));
             // res.send({error: true, message: 'does not match the password'});
         }
 
         const token = jwt.sign({_id: user._id}, process.env.JWT_SECRETE);
 
         res.status(201).cookie("token", token, { 
-            httpOnly: true, maxAge: 15 * 60 * 1000, 
-            sameSite : process.env.NODE_ENV === "Development" ? "lax" : "none",
-            secure: process.env.NODE_ENV === "Development" ? false : true,})
+            httpOnly: true, maxAge: 15 * 60 * 1000 })
             .send({error: false, message: `welcome back ${user.name}`}); 
     
     } catch (err) {
@@ -168,3 +171,5 @@ exports.logout = async(req, res) => {
 //         res.status(500).send({ error: true, message: 'failed to delete', err})
 //     }
 // }
+// sameSite : process.env.NODE_ENV === "Development" ? "lax" : "none",
+// secure: process.env.NODE_ENV === "Development" ? false : true,

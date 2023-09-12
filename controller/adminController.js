@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const Admin = require('../models/admin');
 const User = require('../models/userSchema');
 const Product = require('../models/product');
-const validate = require('../validation/productValidate');
+const { validateMerchnt, validatepro, getvalidate, updateValidate, deletevalidate } = require('../validation/productValidate');
 const errorHandler = require('../middleware/errorclass');
 
 
@@ -17,7 +17,11 @@ exports.create = async(req, res, next) => {
             password: req.body.password
         }
         
-        await validate.validateMerchnt(params);
+        const validate = await validateMerchnt.validate(params);
+        if(validate.error) {
+            return next(new errorHandler("credentials are invalid.", 400));
+        }
+
         const hashedPassword = await bcrypt.hash(params.password, 10);
         params.password = hashedPassword;
         
@@ -51,7 +55,10 @@ exports.add = async(req, res) => {
             // res.status(403).send({ error: true, message: 'you dont have the access to Add the product.'})
         }
         
-        await validate.validatepro(params);
+        const validate = await validatepro.validate(params);
+        if(validate.error) {
+            return next(new errorHandler("credentials are invalid.", 400));
+        }
 
         const product = await Product.create(params);
         // console.log(`product:`, product)
@@ -69,7 +76,11 @@ exports.get = async(req, res) => {
             limit: req.query.limit
         }
 
-        await validate.getvalidate(params);
+        const validate = await getvalidate.validate(params);
+        if(validate.error) {
+            return next(new errorHandler("credentials are invalid.", 400));
+        }
+
         const get = await Product.find({ name: params.sort });
 
         if(!get) {
@@ -97,7 +108,11 @@ exports.update = async(req, res) => {
             description: req.body.description
         }
 
-        await validate.updateValidate({ id, params });
+        const validate = await updateValidate.validate({ id, params });
+        if(validate.error) {
+            return next(new errorHandler("credentials are invalid.", 400));
+        }
+
         const exists = await Product.findById({ _id: id });
 
         if(!exists) {
@@ -118,7 +133,11 @@ exports.delete = async(req, res) => {
     try {
 
         const id = req.params.id;
-        await validate.deletevalidate(id);
+        const validate = await validate.deletevalidate(id);
+        if(validate.error) {
+            return next(new errorHandler("credentials are invalid.", 400));
+        }
+        
         const exists = await Product.findById({ _id: id });
 
         if(!exists) {
