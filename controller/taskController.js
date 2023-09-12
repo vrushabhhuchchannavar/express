@@ -8,7 +8,6 @@ exports.newTask = async(req, res) => {
         
         const task = await Task.create({ title,  description, user });
         
-        // console.log(`task: ${JSON.stringify(task)}`)
         res.status(201).send({ error: false, message: 'task added.' });
     } catch (err) {
         res.send({ error: true, result: err });
@@ -18,8 +17,9 @@ exports.newTask = async(req, res) => {
 exports.getTask = async(req, res) => {
     try {
         const userId = req.user._id;
-        // console.log(`user: ${userId}`);
+        
         const task = await Task.find({ user: userId });
+        
         // console.log(`task: ${JSON.stringify(task)}`)
         res.status(201).send({ error: false, result: task });
     } catch (err) {

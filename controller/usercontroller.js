@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const errorHandler = require('../middleware/errorclass');
 const User = require('../models/userSchema');
+const validate = require('../validation/uservalidation');
 
 // exports.getAll = async(req, res) => {
 //     const users = await User.find();
@@ -28,7 +29,6 @@ const User = require('../models/userSchema');
 exports.getById = (req, res) => {
     try {
 
-
         res.status(201).send({ success: true, result: req.user });
     } catch (err) {
         res.status(500).send({ error: true, message: 'failed to read the user', err})
@@ -43,8 +43,7 @@ exports.create = async(req, res, next) => {
             password: req.body.password
         } 
 
-        // let auth = req.headers.authToken;
-
+        await validate.validateUSer(params);
         let existUser = await User.findOne({ email: params.email });
         if(existUser) {
             return next(new errorHandler("user already exists.", 401));
@@ -52,7 +51,7 @@ exports.create = async(req, res, next) => {
         }
        
         if(!params.name || !params.email || !params.password) {
-            return next(new errorHandler('required all values', 404))
+            return next(new errorHandler('required all values', 401))
             // res.status(404).send({ error: true, message: 'required all values'});
         } 
 
@@ -62,16 +61,6 @@ exports.create = async(req, res, next) => {
         const user = await User.create(params);
         
         const token = jwt.sign({_id: user._id}, process.env.JWT_SECRETE);
-        // let ver = jwt.verify(tok, process.env.JWT_SECRETE)
-        // console.log(`token: ${JSON.stringify(token)}`);
-
-        // req.headers.authToken =  token
-        // console.log(`response = ${auth}`)
-        // console.dir(req.headers);
-        
-        console.log(process.env.NODE_ENV);
-        console.log(process.env.NODE_ENV === "Development");
-
 
         res.status(201)
         .cookie("token", token, { 
@@ -81,11 +70,9 @@ exports.create = async(req, res, next) => {
             secure: process.env.NODE_ENV === "Development" ? false : true,
         })
         .send({ error: false, message: 'registered successfully', result: user });
-        // console.dir(res);
+        
 
     } catch (err) { 
-        // console.log(`
-        // res: ${JSON.stringify(res)}`);
         res.status(500).send({ error: true, message: 'failed to create', err })
     }
     
@@ -94,10 +81,10 @@ exports.create = async(req, res, next) => {
 exports.login = async(req, res, next) => {
     try {
         let { email, password } = req.body;
+
+        await validate.validatelogin({ email, password });
         let user = await User.findOne({ email }).select("+password");
-        // console.log(` 
-        // user: ${JSON.stringify(user)}
-        // `);
+        
         if(!user) {
             return next(new errorHandler('invalid email or password', 404));
             // res.status(404).send({error: true, message: 'invalid email or password'});
@@ -106,16 +93,18 @@ exports.login = async(req, res, next) => {
         const matchpass = bcrypt.compare(password, user.password);
         
         if(!matchpass) {
-            return next(new errorHandler('does not match the password', 401));
+            return next(new errorHandler('does not match the password', 404));
             // res.send({error: true, message: 'does not match the password'});
         }
 
-        
-        
+        const token = jwt.sign({_id: user._id}, process.env.JWT_SECRETE);
+
         res.status(201).cookie("token", token, { 
             httpOnly: true, maxAge: 15 * 60 * 1000, 
             sameSite : process.env.NODE_ENV === "Development" ? "lax" : "none",
-            secure: process.env.NODE_ENV === "Development" ? false : true,}).send({error: false, message: `welcome back ${user.name}`}); 
+            secure: process.env.NODE_ENV === "Development" ? false : true,})
+            .send({error: false, message: `welcome back ${user.name}`}); 
+    
     } catch (err) {
         res.status(500).send({error: true, err});
     }
@@ -125,8 +114,17 @@ exports.logout = async(req, res) => {
 
     res.status(201)
         .cookie("token", "", { expires: new Date(Date.now()) })
-        .send({ error: false })
+        .send({ error: false, message: 'you logged out sucessfully.' });
 }
+
+
+
+
+// exports.getProducts = async(req, res, next) => {
+
+// }
+
+
 
 // exports.update = async(req, res) => {
 //     try {
