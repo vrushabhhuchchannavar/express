@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 require("dotenv").config();
 const cors = require('cors');
 
+const adminRouter = require('./routes/adminroute');
 const userRouter = require('./routes/routes');
 const taskRouter = require('./routes/taskroute');
 // const { errormiddleware } = require('./error/error');
@@ -19,26 +20,28 @@ mongoose.connect(process.env.MONGO_URI, {
 
 
 
-// adding middlware read the requested body values
-app.use(bodyParser.json());
+// adding middlware read the requested values
+// app.use(bodyParser.json());
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
     origin: [process.env.FRONTEND_URL],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true
 }));
 // app.use(bodyParser.urlencoded({extended: false}));
 
+app.use("/api/v1", adminRouter);
 app.use("/api/v1", userRouter);
-app.use("/api/v1/", taskRouter);
+app.use("/api/v1", taskRouter);
 
 // error middleware
+app.use(middleWare);
 
 
 app.listen(process.env.PORT, () => {
     console.log(`server is running successfully.`)
 });
 
-app.use(middleWare);
+
 
