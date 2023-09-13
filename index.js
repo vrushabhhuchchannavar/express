@@ -8,6 +8,8 @@ const cors = require('cors');
 const adminRouter = require('./routes/adminroute');
 const userRouter = require('./routes/routes');
 const taskRouter = require('./routes/taskroute');
+const orderRouter = require('./routes/orderroute');
+
 // const { errormiddleware } = require('./error/error');
 const middleWare = require('./middleware/middlware');
 
@@ -34,6 +36,7 @@ app.use(cors({
 app.use("/api/v1", adminRouter);
 app.use("/api/v1", userRouter);
 app.use("/api/v1", taskRouter);
+app.use("/api/v1", orderRouter);
 
 // error middleware
 app.use(middleWare);

@@ -16,4 +16,6 @@ router.delete('/delete', adminValidation, controller.delete);
 
 router.get('/all', adminValidation, controller.getUser);
 
+router.get('/orders', adminValidation, controller.orders);
+
 module.exports = router;

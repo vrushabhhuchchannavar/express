@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const Admin = require('../models/admin');
 const User = require('../models/userSchema');
 const Product = require('../models/product');
+const Order = require('../models/order');
 const { validateMerchnt, validatepro, getvalidate, updateValidate, deletevalidate } = require('../validation/productValidate');
 const errorHandler = require('../middleware/errorclass');
 
@@ -73,22 +74,37 @@ exports.get = async(req, res) => {
     try {
         const params = {
             sort: req.query.sort, 
-            limit: req.query.limit
+            limit: req.query.limit,
+            from: req.query.from,
+            to: req.query.to
         }
-
+       
         const validate = await getvalidate.validate(params);
         if(validate.error) {
             return next(new errorHandler("credentials are invalid.", 400));
         }
+        
+        let read;
+        if(params.from && params.to) {
+          
+            read = await Product.find({
+                value: { $gte: params.from, $lte: params.to }
+            },
+            {
+                name: 1, type: 1, value: 1, description: 1
+            })
+        } else {
+            read = await Product.find({ name: params.sort });
+            // return read;
+            // console.log(`valid:`, read)
+        }
 
-        const get = await Product.find({ name: params.sort });
-
-        if(!get) {
+        if(!read) {
             return next(new errorHandler(`sorry, we cant find any products on this ${params.sort}`))
             // res.status(404).send({error: true, message: `Sorry, we dont have any products on theses ${sort}`});
         }
 
-        const limitedData = get.slice(0, params.limit);
+        const limitedData = read.slice(0, params.limit);
 
         res.status(201).send({ error: false, message: `we have these many on ${params.sort}`, result: limitedData});
 
@@ -164,5 +180,19 @@ exports.getUser = async(req, res, next) => {
         res.status(200).send({ error: false, message: 'these are the users.', result: users });
     } catch (e) {
         res.status(500).send({ error: true, message: 'Internal server error.'});
+    }
+}
+
+
+exports.orders = async(req, res) => {
+
+    try {
+
+        const orders = await Order.find();
+        // console.log(`orders:`, orders);
+
+        res.status(201).send({ error: false, data: orders });
+    } catch (e) {
+        res.status(500).send({ error: true, message: 'Internal server error'});
     }
 }

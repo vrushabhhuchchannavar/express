@@ -29,6 +29,11 @@ const { validateUser, validatelogin} = require('../validation/uservalidation');
 exports.getById = (req, res) => {
     try {
 
+        // const user = req.user;
+        // if(!user) {
+        //     res.status(403).send({ error: true, message: 'please login.'});
+        // }
+
         res.status(201).send({ success: true, result: req.user });
     } catch (err) {
         res.status(500).send({ error: true, message: 'failed to read the user', err})
@@ -54,10 +59,10 @@ exports.create = async(req, res, next) => {
             // res.status(401).send({ error: true, message: 'user alresdy exists' })
         }
        
-        if(!params.name || !params.email || !params.password) {
-            return next(new errorHandler('required all values', 401))
-            // res.status(404).send({ error: true, message: 'required all values'});
-        } 
+        // if(!params.name || !params.email || !params.password) {
+        //     return next(new errorHandler('required all values', 401))
+        //     res.status(404).send({ error: true, message: 'required all values'});
+        // } 
 
         let hashedPassword = await bcrypt.hash(params.password, 10);
         params.password = hashedPassword; 
@@ -85,7 +90,7 @@ exports.login = async(req, res, next) => {
 
         const validate = await validatelogin.validate({ email, password });
         if(validate.error) {
-            return next(new errorHandler("credentials are invalid.", 400));
+            return next(new errorHandler("login credentials are invalid.", 400));
         }
 
         let user = await User.findOne({ email }).select("+password");

@@ -19,7 +19,9 @@ exports.validatepro = Joi.object({
 
 exports.getvalidate = Joi.object({
     sort: Joi.string(),
-    limit: Joi.number()
+    limit: Joi.number(),
+    from: Joi.number(),
+    to: Joi.number()
 });
 
 
