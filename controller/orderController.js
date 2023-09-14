@@ -1,9 +1,10 @@
+const mongoose = require('mongoose');
 const Order = require('../models/order');
 const Product = require('../models/product');
-const getvalidate = require('../validation/productValidate')
+const { getvalidate } = require('../validation/productValidate')
+const errorHandler = require('../middleware/errorclass');
 
-
-exports.getProducts = async(req, res) => {
+exports.getProducts = async(req, res, next) => {
 
     try {
         const params = {
@@ -30,7 +31,7 @@ exports.getProducts = async(req, res) => {
         } else {
             read = await Product.find({ name: params.sort });
         }
-
+       
         if(!read) {
             return next(new errorHandler(`sorry, we cant find any products on this ${params.sort}`))
             // res.status(404).send({error: true, message: `Sorry, we dont have any products on theses ${sort}`});
@@ -38,7 +39,7 @@ exports.getProducts = async(req, res) => {
 
         const limitedData = read.slice(0, params.limit);
 
-        res.status(201).send({ error: false, message: `we have these many on ${params.sort}`, result: limitedData});
+        res.status(201).send({ error: false, message: `we have these many on ${params.sort}`, result: limitedData });
 
     } catch (error) {
         res.status(500).send({ error: true, message: 'Internal server error.', error });
@@ -78,9 +79,10 @@ exports.cancelOrder = async(req, res) => {
         // console.log(`order:`, order);
         // const find = await Order.find({ _id: id });
 
-        const canceled = await Order.deleteOne({ _id: id });
+        const canceled = await Order.deleteOne({ _id: mongoose.Types.ObjectId(id) });
         // console.log(`can:`, canceled);
         res.status(201).send({ error: false, message: 'order is concelled', result: canceled });
+
     } catch (error) {
         res.status(500).send({ error: true, message: 'Internal server error', error });
     }

@@ -2,14 +2,14 @@ const Joi = require('joi');
 Joi.objectId = require('joi-objectid')(Joi);
 
 
-exports.validateMerchnt = Joi.object({
+exports.validateAdmin = Joi.object({
     name: Joi.string().required(),
     email: Joi.string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/).required(),
     password: Joi.string().min(4).max(8).required()
 });
 
 
-exports.validatepro = Joi.object({
+exports.validateproduct = Joi.object({
     name: Joi.string().required(),
     type: Joi.string().required(),
     value: Joi.string().required(),

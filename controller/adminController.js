@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
@@ -5,8 +6,8 @@ const Admin = require('../models/admin');
 const User = require('../models/userSchema');
 const Product = require('../models/product');
 const Order = require('../models/order');
-const { validateMerchnt, validatepro, updateValidate, deletevalidate } = require('../validation/productValidate');
 const errorHandler = require('../middleware/errorclass');
+const { validateAdmin, validateproduct, updateValidate, deletevalidate } = require('../validation/productValidate');
 
 
 exports.createAdmin = async(req, res, next) => {
@@ -18,7 +19,7 @@ exports.createAdmin = async(req, res, next) => {
             password: req.body.password
         }
         
-        const validate = await validateMerchnt.validate(params);
+        const validate = await validateAdmin.validate(params);
         if(validate.error) {
             return next(new errorHandler("credentials are invalid.", 400));
         }
@@ -32,14 +33,14 @@ exports.createAdmin = async(req, res, next) => {
 
         res.status(201).cookie("token", token, { 
             httpOnly: true, 
-            maxAge: 15 * 60 * 1000, }).send({ error: false, message: 'admin createc successfully.'});
+            maxAge: 15 * 60 * 1000, }).send({ error: false, message: 'admin created successfully.'});
 
     } catch (error) {
         res.status(500).send({ error: true, message: 'Internal server error', error })
     }
 }
 
-exports.addProducts = async(req, res) => {
+exports.addProducts = async(req, res, next) => {
 
     try {
         const params = {
@@ -50,14 +51,15 @@ exports.addProducts = async(req, res) => {
         }
 
         let admin = req.admin;
-        if(!admin) {
-            return next(new errorHandler('you dont have access to add or remove the products.', 403));
-            // res.status(403).send({ error: true, message: 'you dont have the access to Add the product.'})
-        }
-        
-        const validate = await validatepro.validate(params);
+
+        const validate = await validateproduct.validate(params);
         if(validate.error) {
             return next(new errorHandler("credentials are invalid.", 400));
+        }
+
+        if(!admin) {
+            return next(new errorHandler('Sorry, you dont have access to add and remove the products.', 403));
+            // res.status(403).send({ error: true, message: 'you dont have the access to Add the product.'})
         }
 
         const product = await Product.create(params);
@@ -68,7 +70,7 @@ exports.addProducts = async(req, res) => {
     }
 }
 
-exports.updateProduct = async(req, res) => {
+exports.updateProduct = async(req, res, next) => {
 
     try {
         const params = {
@@ -84,10 +86,10 @@ exports.updateProduct = async(req, res) => {
             return next(new errorHandler("credentials are invalid.", 400));
         }
 
-        const exists = await Product.findById({ _id: params.id });
+        const exists = await Product.findById({ _id: mongoose.Types.ObjectId(params.id)});
 
         if(!exists) {
-            return next(new errorHandler(`product is not present on this ${params.name}`, 404));
+            return next(new errorHandler(`sorry, product is not found on this ${params.name}`, 404));
             // res.status(404).send({ error: true, message: `product is not present on this ${params.name}`});
         }
 
@@ -100,7 +102,7 @@ exports.updateProduct = async(req, res) => {
     }
 }
 
-exports.deleteProduct = async(req, res) => {
+exports.deleteProduct = async(req, res, next) => {
 
     try {
 
@@ -110,14 +112,14 @@ exports.deleteProduct = async(req, res) => {
             return next(new errorHandler("credentials are invalid.", 400));
         }
         
-        const exists = await Product.findById({ _id: id });
+        const exists = await Product.findById({ _id: mongoose.Types.ObjectId(id) });
 
         if(!exists) {
             return next(new errorHandler(`product is not found`, 404));
             // res.status(404).send({ error: true, message: `product is not present on this ${params.name}`});
         }
 
-        const product = await Product.deleteOne({ _id: id });
+        const product = await Product.deleteOne({ _id: mongoose.Types.ObjectId(id) });
         // console.log(product)
 
         res.status(201).send({ error: false, message: 'product is deleted.', result: product });
@@ -127,7 +129,7 @@ exports.deleteProduct = async(req, res) => {
     }
 }
 
-exports.getAllUsers = async(req, res, next) => {
+exports.getAllUsers = async(req, res) => {
 
     try {
 

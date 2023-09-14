@@ -15,6 +15,7 @@ const middleWare = require('./middleware/middlware');
 
 const app = express();
 
+
 mongoose.connect(process.env.MONGO_URI, {
     dbName: "backend",
 }).then(() => console.log("db is connected successfully."))
@@ -33,10 +34,12 @@ app.use(cors({
 }));
 // app.use(bodyParser.urlencoded({extended: false}));
 
+
 app.use("/api/v1", adminRouter);
 app.use("/api/v1", userRouter);
 app.use("/api/v1", taskRouter);
 app.use("/api/v1", orderRouter);
+
 
 // error middleware
 app.use(middleWare);

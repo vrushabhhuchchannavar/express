@@ -1,9 +1,10 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 
 const errorHandler = require('../middleware/errorclass');
 const User = require('../models/userSchema');
-const { validateUser, validatelogin} = require('../validation/uservalidation');
+const { validateUser, validatelogin } = require('../validation/uservalidation');
 
 // exports.getAll = async(req, res) => {
 //     const users = await User.find();
@@ -26,7 +27,7 @@ const { validateUser, validatelogin} = require('../validation/uservalidation');
 //     res.send({ error: false, message: 'users with same name', result: user})
 // }
 
-exports.getById = (req, res) => {
+exports.getUser = (req, res) => {
     try {
 
         // const user = req.user;
