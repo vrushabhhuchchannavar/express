@@ -1,8 +1,52 @@
 const Order = require('../models/order');
-const jwt = require('jsonwebtoken');
+const Product = require('../models/product');
+const getvalidate = require('../validation/productValidate')
 
 
-exports.placeOrd = async(req, res) => {
+exports.getProducts = async(req, res) => {
+
+    try {
+        const params = {
+            sort: req.query.sort, 
+            limit: req.query.limit,
+            from: req.query.from,
+            to: req.query.to
+        }
+       
+        const validate = await getvalidate.validate(params);
+        if(validate.error) {
+            return next(new errorHandler("credentials are invalid.", 400));
+        }
+        
+        let read;
+        if(params.from && params.to) {
+          
+            read = await Product.find({
+                value: { $gte: params.from, $lte: params.to }
+            },
+            {
+                name: 1, type: 1, value: 1, description: 1
+            })
+        } else {
+            read = await Product.find({ name: params.sort });
+        }
+
+        if(!read) {
+            return next(new errorHandler(`sorry, we cant find any products on this ${params.sort}`))
+            // res.status(404).send({error: true, message: `Sorry, we dont have any products on theses ${sort}`});
+        }
+
+        const limitedData = read.slice(0, params.limit);
+
+        res.status(201).send({ error: false, message: `we have these many on ${params.sort}`, result: limitedData});
+
+    } catch (error) {
+        res.status(500).send({ error: true, message: 'Internal server error.', error });
+    }
+}
+
+
+exports.placeOrder = async(req, res) => {
 
     try {
         const params = {
@@ -19,13 +63,13 @@ exports.placeOrd = async(req, res) => {
         res.status(201)
             .send({ error: false, message: 'order placed successfully.', result: order});
 
-    } catch (err) {
-        res.status(500).send({ error: true, message: 'Internal server error.'});
+    } catch (error) {
+        res.status(500).send({ error: true, message: 'Internal server error.', error });
     }
 }
 
 
-exports.cancel = async(req, res) => {
+exports.cancelOrder = async(req, res) => {
     try {
 
         const id = req.params.id;
@@ -37,7 +81,7 @@ exports.cancel = async(req, res) => {
         const canceled = await Order.deleteOne({ _id: id });
         // console.log(`can:`, canceled);
         res.status(201).send({ error: false, message: 'order is concelled', result: canceled });
-    } catch (err) {
-        res.status(500).send({ error: true, message: 'Internal server error'});
+    } catch (error) {
+        res.status(500).send({ error: true, message: 'Internal server error', error });
     }
 }

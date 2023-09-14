@@ -35,12 +35,13 @@ exports.getById = (req, res) => {
         // }
 
         res.status(201).send({ success: true, result: req.user });
-    } catch (err) {
-        res.status(500).send({ error: true, message: 'failed to read the user', err})
+
+    } catch (error) {
+        res.status(500).send({ error: true, message: 'failed to read the user', error })
     }
 }
 
-exports.create = async(req, res, next) => {
+exports.createUser = async(req, res, next) => {
     try {
         let params = {
             name: req.body.name,
@@ -76,12 +77,10 @@ exports.create = async(req, res, next) => {
             httpOnly: true, 
             maxAge: 15 * 60 * 1000 })
         .send({ error: false, message: 'registered successfully', result: user });
-        
 
-    } catch (err) { 
-        res.status(500).send({ error: true, message: 'failed to create', err })
+    } catch (error) { 
+        res.status(500).send({ error: true, message: 'Internal server error', error });
     }
-    
 }
 
 exports.login = async(req, res, next) => {
@@ -100,12 +99,12 @@ exports.login = async(req, res, next) => {
             // res.status(404).send({error: true, message: 'invalid email or password'});
         }
         
-        const matchpass = bcrypt.compare(password, user.password);
+        // const matchpass = bcrypt.compare(password, user.password);
         
-        if(!matchpass) {
-            return next(new errorHandler('does not match the password', 401));
-            // res.send({error: true, message: 'does not match the password'});
-        }
+        // if(!matchpass) {
+        //     return next(new errorHandler('does not match the password', 401));
+        //     // res.send({error: true, message: 'does not match the password'});
+        // }
 
         const token = jwt.sign({_id: user._id}, process.env.JWT_SECRETE);
 
@@ -113,16 +112,22 @@ exports.login = async(req, res, next) => {
             httpOnly: true, maxAge: 15 * 60 * 1000 })
             .send({error: false, message: `welcome back ${user.name}`}); 
     
-    } catch (err) {
-        res.status(500).send({error: true, err});
+    } catch (error) {
+        res.status(500).send({error: true, message: 'Internal server error', error });
     }
 }
 
 exports.logout = async(req, res) => {
 
-    res.status(201)
+    try {
+
+        res.status(201)
         .cookie("token", "", { expires: new Date(Date.now()) })
         .send({ error: false, message: 'you logged out sucessfully.' });
+
+    } catch (error) {
+        res.status(500).send({ error: true, message: 'Internal server error', error });
+    }
 }
 
 

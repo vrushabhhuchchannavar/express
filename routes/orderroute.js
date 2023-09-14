@@ -5,9 +5,11 @@ const { validateOrder } = require('../auth/authOrder');
 
 const router = express.Router();
 
-router.post('/order', vidateuser, controller.placeOrd);
+router.get('/read', controller.getProducts);
 
-router.delete('/cancel/:id', vidateuser, controller.cancel);
+router.post('/order', vidateuser, controller.placeOrder);
+
+router.delete('/cancel/:id', vidateuser, controller.cancelOrder);
 
 
 

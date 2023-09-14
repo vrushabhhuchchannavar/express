@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get('/userId', vidateuser, controller.getById);
 
-router.post('/user/reg', controller.create);
+router.post('/user/reg', controller.createUser);
 
 router.post('/user/login', controller.login);
 

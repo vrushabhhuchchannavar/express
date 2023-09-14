@@ -4,18 +4,16 @@ const { adminValidation } = require('../auth/adminauth');
 
 const router = express.Router();
 
-router.post('/', controller.create);
+router.post('/', controller.createAdmin);
 
-router.post('/add', adminValidation, controller.add);
+router.post('/add', adminValidation, controller.addProducts);
 
-router.get('/read', controller.get);
+router.patch('/update', adminValidation, controller.updateProduct);
 
-router.patch('/update', adminValidation, controller.update);
+router.delete('/delete', adminValidation, controller.deleteProduct);
 
-router.delete('/delete', adminValidation, controller.delete);
+router.get('/all', adminValidation, controller.getAllUsers);
 
-router.get('/all', adminValidation, controller.getUser);
-
-router.get('/orders', adminValidation, controller.orders);
+router.get('/orders', adminValidation, controller.getAllOrders);
 
 module.exports = router;
