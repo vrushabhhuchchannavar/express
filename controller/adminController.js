@@ -13,22 +13,44 @@ const { validateAdmin, validateproduct, updateValidate, deletevalidate } = requi
 exports.createAdmin = async(req, res, next) => {
 
     try {
+
         const params = {
             name: req.body.name,
             email: req.body.email,
             password: req.body.password
         }
         
+        // console.log(params);
+        // const adminPayload = {
+        //     name: process.env.NAME,
+        //     email: process.env.EMAIL,
+        //     password: process.env.PASSWORD
+        // }
+
+        // console.log(adminPayload)
+
+        // if(params == adminPayload) {
+        //     console.log('equaled..')
+        // }
+
+
+        // if(params != adminPayload) {
+        //     console.log('adminPayload:', adminPayload);
+        //     console.log('params:', params);
+        //     console.log('its getting.')
+        //     res.status(400).send({ error: true, message: 'credentials are invalid.'});
+        // }
+        
         const validate = await validateAdmin.validate(params);
         if(validate.error) {
-            return next(new errorHandler("credentials are invalid.", 400));
+            return next(new errorHandler("please enter valid credentials", 400));
         }
 
         const hashedPassword = await bcrypt.hash(params.password, 10);
         params.password = hashedPassword;
         
         const admin = await Admin.create(params);
-        
+
         const token = jwt.sign({_id: admin._id}, process.env.JWT_SECRETE);
 
         res.status(201).cookie("token", token, { 
@@ -54,7 +76,7 @@ exports.addProducts = async(req, res, next) => {
 
         const validate = await validateproduct.validate(params);
         if(validate.error) {
-            return next(new errorHandler("credentials are invalid.", 400));
+            return next(new errorHandler("enter valid credentials", 400));
         }
 
         if(!admin) {
@@ -83,7 +105,7 @@ exports.updateProduct = async(req, res, next) => {
 
         const validate = await updateValidate.validate(params);
         if(validate.error) {
-            return next(new errorHandler("credentials are invalid.", 400));
+            return next(new errorHandler("enter valid credentials", 400));
         }
 
         const exists = await Product.findById({ _id: mongoose.Types.ObjectId(params.id)});
@@ -109,7 +131,7 @@ exports.deleteProduct = async(req, res, next) => {
         const id = req.params.id;
         const validate = await deletevalidate.validate(id);
         if(validate.error) {
-            return next(new errorHandler("credentials are invalid.", 400));
+            return next(new errorHandler("enter valid credentials", 400));
         }
         
         const exists = await Product.findById({ _id: mongoose.Types.ObjectId(id) });
@@ -126,31 +148,5 @@ exports.deleteProduct = async(req, res, next) => {
 
     } catch (error) {
         res.status(500).send({ error: true, message: 'Internal server error.', error });
-    }
-}
-
-exports.getAllUsers = async(req, res) => {
-
-    try {
-
-        const users = await User.find();
-
-        res.status(200).send({ error: false, message: 'these are the users.', result: users });
-    } catch (error) {
-        res.status(500).send({ error: true, message: 'Internal server error.', error });
-    }
-}
-
-
-exports.getAllOrders = async(req, res) => {
-
-    try {
-
-        const orders = await Order.find();
-        // console.log(`orders:`, orders);
-
-        res.status(201).send({ error: false, data: orders });
-    } catch (error) {
-        res.status(500).send({ error: true, message: 'Internal server error', error });
     }
 }

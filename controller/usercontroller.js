@@ -38,9 +38,30 @@ exports.getUser = (req, res) => {
         res.status(201).send({ success: true, result: req.user });
 
     } catch (error) {
-        res.status(500).send({ error: true, message: 'failed to read the user', error })
+        res.status(500).send({ error: true, message: 'Internal server error', error })
     }
 }
+
+
+exports.getAllUsers = async(req, res) => {
+
+    try {
+        let page = req.query.page;
+        let limit = req.query.limit;
+        let skipCount = (page-1) * limit;
+
+        if(page<1) {
+            return next(new errorHandler('page has to be greater than or equal to 1', 401));
+        }
+
+        const users = await User.find().skip(skipCount).limit(limit);
+
+        res.status(200).send({ error: false, message: 'these are the users.', result: users });
+    } catch (error) {
+        res.status(500).send({ error: true, message: 'Internal server error.', error });
+    }
+}
+
 
 exports.createUser = async(req, res, next) => {
     try {
@@ -52,7 +73,7 @@ exports.createUser = async(req, res, next) => {
 
         const validate = await validateUser.validate(params);
         if(validate.error) {
-            return next(new errorHandler("user credentials are invalid.", 400));
+            return next(new errorHandler("please enter valid credentials.", 400));
         }
         
         let existUser = await User.findOne({ email: params.email });
@@ -84,13 +105,65 @@ exports.createUser = async(req, res, next) => {
     }
 }
 
+
+exports.updateUser = async(req, res) => {
+
+    try {
+
+        const params = {
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password
+        }
+
+        const exist = await User.findOne({ email: params.email }).select("+password");
+
+        if(!exist) {
+            return next(new errorHandler('user does not exists', 404));
+        }
+
+        const user = await User.findByIdAndUpdate({ _id: exist._id });
+
+        res.status(200)
+        .cookie("token", token, { 
+            httpOnly: true, 
+            maxAge: 15 * 60 * 1000 })
+        .send({ error: false, message: 'user updated successfully', result: user });
+    } catch (error) {
+        res.status(500).send({ error: true, message: 'internal server error', error });
+    }
+}
+
+
+exports.deleteuser = async(req, res) => {
+
+    try {
+
+        const id = req.params.id;
+
+        const user = await User.findById(id);
+
+        if(!user) {
+            return next(new errorHandler('user is does not exists', 404));
+        }
+
+        await User.deleteOne(id);
+
+        res.status(200).send({ error: true, message: 'user is deleted successfully', error });
+    } catch (error) {
+        res.status(500).send({ error: true, message: 'Internal server error', error });
+    }
+}
+
+
+
 exports.login = async(req, res, next) => {
     try {
         let { email, password } = req.body;
 
         const validate = await validatelogin.validate({ email, password });
         if(validate.error) {
-            return next(new errorHandler("login credentials are invalid.", 400));
+            return next(new errorHandler("please enter valid credentials.", 400));
         }
 
         let user = await User.findOne({ email }).select("+password");

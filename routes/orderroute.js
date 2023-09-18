@@ -1,11 +1,13 @@
 const express = require('express');
 const controller = require('../controller/orderController');
 const { vidateuser } = require('../auth/auth');
-const { validateOrder } = require('../auth/authOrder');
+const { adminValidation } = require('../auth/adminauth');
 
 const router = express.Router();
 
 router.get('/read', controller.getProducts);
+
+router.get('/orders', adminValidation, controller.getAllOrders);
 
 router.post('/order', vidateuser, controller.placeOrder);
 

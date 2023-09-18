@@ -47,6 +47,27 @@ exports.getProducts = async(req, res, next) => {
 }
 
 
+exports.getAllOrders = async(req, res) => {
+
+    try {
+        let page = req.query.page;
+        let limit = req.query.limit;
+        let skipCount = (page-1) * limit;
+
+        if(page<1) {
+            return next(new errorHandler('page has to be greater than or equal to 1', 401));
+        }
+
+        const orders = await Order.find().skip(skipCount).limit(limit);
+        // console.log(`orders:`, orders);
+
+        res.status(201).send({ error: false, data: orders });
+    } catch (error) {
+        res.status(500).send({ error: true, message: 'Internal server error', error });
+    }
+}
+
+
 exports.placeOrder = async(req, res) => {
 
     try {

@@ -1,6 +1,7 @@
 const express = require('express');
 const controller = require('../controller/usercontroller');
 const { vidateuser } = require('../auth/auth');
+const { adminValidation } = require('../auth/adminauth');
 
 const router = express.Router();
 
@@ -10,7 +11,13 @@ const router = express.Router();
 
 router.get('/userId', vidateuser, controller.getUser);
 
+router.get('/all', adminValidation, controller.getAllUsers);
+
 router.post('/user/reg', controller.createUser);
+
+router.patch('/user/update', controller.updateUser);
+
+router.delete('/user/delete', controller.deleteuser);
 
 router.post('/user/login', controller.login);
 
