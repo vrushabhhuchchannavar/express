@@ -53,8 +53,8 @@ exports.getAllOrders = async(req, res) => {
         let page = req.query.page;
         let limit = req.query.limit;
         let skipCount = (page-1) * limit;
-
-        const validate = await getAllOrdersValidate.validate(page, limit);
+       
+        const validate = await getAllOrdersValidate.validate({page, limit});
         if (validate.error) {
             return next(new errorHandler('please put valid credentials', 401));
         }
@@ -62,9 +62,7 @@ exports.getAllOrders = async(req, res) => {
         if(page<1) {
             return next(new errorHandler('page has to be greater than or equal to 1', 401));
         }
-
         const orders = await Order.find().skip(skipCount).limit(limit);
-        // console.log(`orders:`, orders);
 
         res.status(201).send({ error: false, data: orders });
     } catch (error) {

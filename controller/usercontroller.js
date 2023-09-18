@@ -43,24 +43,25 @@ exports.getUser = (req, res) => {
 }
 
 
-exports.getAllUsers = async(req, res) => {
+exports.getAllUsers = async(req, res, next) => {
 
     try {
         let page = req.query.page;
         let limit = req.query.limit;
         let skipCount = (page-1) * limit;
-
-        const validate = await getAllusersValidate.validate(page, limit);
+        
+        const validate = await getAllusersValidate.validate({page, limit});
+        
         if (validate.error) {
             return next(new errorHandler('please put valid credentials', 401));
         }
         
-        if(page<1) {
-            return next(new errorHandler('page has to be greater than or equal to 1', 401));
+        if(page < 1) {
+            return next(new errorHandler('page has to be greater than 1', 401));
         }
-
+         
         const users = await User.find().skip(skipCount).limit(limit);
-
+        
         res.status(200).send({ error: false, message: 'these are the users.', result: users });
     } catch (error) {
         res.status(500).send({ error: true, message: 'Internal server error.', error });
@@ -111,7 +112,7 @@ exports.createUser = async(req, res, next) => {
 }
 
 
-exports.updateUser = async(req, res) => {
+exports.updateUser = async(req, res, next) => {
 
     try {
 
@@ -140,7 +141,7 @@ exports.updateUser = async(req, res) => {
 }
 
 
-exports.deleteuser = async(req, res) => {
+exports.deleteuser = async(req, res, next) => {
 
     try {
 
