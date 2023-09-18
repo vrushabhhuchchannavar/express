@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Order = require('../models/order');
 const Product = require('../models/product');
-const { getvalidate } = require('../validation/productValidate')
+const { getvalidate, getAllOrdersValidate } = require('../validation/productValidate')
 const errorHandler = require('../middleware/errorclass');
 
 exports.getProducts = async(req, res, next) => {
@@ -53,6 +53,11 @@ exports.getAllOrders = async(req, res) => {
         let page = req.query.page;
         let limit = req.query.limit;
         let skipCount = (page-1) * limit;
+
+        const validate = await getAllOrdersValidate.validate(page, limit);
+        if (validate.error) {
+            return next(new errorHandler('please put valid credentials', 401));
+        }
 
         if(page<1) {
             return next(new errorHandler('page has to be greater than or equal to 1', 401));

@@ -21,3 +21,9 @@ exports.validatelogin = Joi.object({
     password: Joi.string().min(4).max(8).required()
 });
 
+
+exports.getAllusersValidate = Joi.object({
+    page: Joi.number(),
+    limit: Joi.number()
+});
+

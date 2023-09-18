@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 const errorHandler = require('../middleware/errorclass');
 const User = require('../models/userSchema');
-const { validateUser, validatelogin } = require('../validation/uservalidation');
+const { validateUser, validatelogin, getAllusersValidate } = require('../validation/uservalidation');
 
 // exports.getAll = async(req, res) => {
 //     const users = await User.find();
@@ -50,6 +50,11 @@ exports.getAllUsers = async(req, res) => {
         let limit = req.query.limit;
         let skipCount = (page-1) * limit;
 
+        const validate = await getAllusersValidate.validate(page, limit);
+        if (validate.error) {
+            return next(new errorHandler('please put valid credentials', 401));
+        }
+        
         if(page<1) {
             return next(new errorHandler('page has to be greater than or equal to 1', 401));
         }

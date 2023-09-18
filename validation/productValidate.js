@@ -36,3 +36,8 @@ exports.updateValidate = Joi.object({
 exports.deletevalidate = Joi.object({
     id: Joi.objectId().required()
 });
+
+exports.getAllOrdersValidate = Joi.object({
+    page: Joi.number(),
+    limit: Joi.number()
+});
