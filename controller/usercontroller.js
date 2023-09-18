@@ -88,11 +88,7 @@ exports.createUser = async(req, res, next) => {
             // res.status(401).send({ error: true, message: 'user alresdy exists' })
         }
        
-        // if(!params.name || !params.email || !params.password) {
-        //     return next(new errorHandler('required all values', 401))
-        //     res.status(404).send({ error: true, message: 'required all values'});
-        // } 
-
+        
         let hashedPassword = await bcrypt.hash(params.password, 10);
         params.password = hashedPassword; 
 
@@ -122,6 +118,11 @@ exports.updateUser = async(req, res, next) => {
             password: req.body.password
         }
 
+        const validate = await validateUser.validate(params);
+        if(validate.error) {
+            return next(new errorHandler("please enter valid credentials.", 400));
+        }
+
         const exist = await User.findOne({ email: params.email }).select("+password");
 
         if(!exist) {
@@ -147,7 +148,7 @@ exports.deleteuser = async(req, res, next) => {
 
         const id = req.params.id;
 
-        const user = await User.findById(id);
+        const user = await User.findById({ _id: mongoose.Types.ObjectId(id) });
 
         if(!user) {
             return next(new errorHandler('user is does not exists', 404));
@@ -219,47 +220,5 @@ exports.logout = async(req, res) => {
 
 
 
-// exports.update = async(req, res) => {
-//     try {
-//         const userId = req.params.id;
-//         const { name, email } = req.body;
-        
-//         const user = await User.findOne({_id: userId});
-//         if(!user) {
-//             res.status(404).send({ error: true, message: 'user is not found'});
-//         }
-
-//         const response = await User.findByIdAndUpdate(userId, {
-//             name: name,
-//             email: email
-//         }, { new: true });
-        
-//         res.status(201).json({
-//             error: false, message: 'user is updated', result: response
-//         });
-//     } catch (err){
-//         res.status(500).send({ error: true, message: 'failed to update', err });
-//     }
-// }
-
-// exports.delete = async(req, res) => {
-//     try { 
-//         const id = req.query.id;
-//         const user = await User.find({id});
-//         if(!user) {
-//             res.status(404).send({ error: true, message: 'user is not found' });
-//         }
-
-//         const response = await User.findByIdAndDelete(id);
-
-//         res.status(201).send({
-//             error: false,
-//             message: 'user is deleted',
-//             result: response
-//         });
-//     } catch (err) {
-//         res.status(500).send({ error: true, message: 'failed to delete', err})
-//     }
-// }
 // sameSite : process.env.NODE_ENV === "Development" ? "lax" : "none",
 // secure: process.env.NODE_ENV === "Development" ? false : true,

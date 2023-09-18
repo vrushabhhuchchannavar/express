@@ -4,7 +4,7 @@ const Product = require('../models/product');
 const { getvalidate, getAllOrdersValidate } = require('../validation/productValidate')
 const errorHandler = require('../middleware/errorclass');
 
-exports.getProducts = async(req, res, next) => {
+exports.getProductsByName = async(req, res, next) => {
 
     try {
         const params = {

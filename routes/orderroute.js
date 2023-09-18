@@ -5,7 +5,7 @@ const { adminValidation } = require('../auth/adminauth');
 
 const router = express.Router();
 
-router.get('/read', controller.getProducts);
+router.get('/read', controller.getProductsByName);
 
 router.get('/orders', adminValidation, controller.getAllOrders);
 
