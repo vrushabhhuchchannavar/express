@@ -74,14 +74,14 @@ exports.addProducts = async(req, res, next) => {
 
         let admin = req.admin;
 
-        const validate = await validateproduct.validate(params);
-        if(validate.error) {
-            return next(new errorHandler("enter valid credentials", 400));
-        }
-
         if(!admin) {
             return next(new errorHandler('Sorry, you dont have access to add and remove the products.', 403));
             // res.status(403).send({ error: true, message: 'you dont have the access to Add the product.'})
+        }
+
+        const validate = await validateproduct.validate(params);
+        if(validate.error) {
+            return next(new errorHandler("enter valid credentials", 400));
         }
 
         const product = await Product.create(params);
@@ -118,7 +118,7 @@ exports.updateProduct = async(req, res, next) => {
         const product = await Product.updateOne(params);
         // console.log(product);
 
-        res.status(201).send({ error: false, message: 'product is updated successfully.', resulr: product });
+        res.status(201).send({ error: false, message: 'product is updated successfully.', result: product });
     } catch (error) {
         res.status(500).send({ error: true, message: 'Internal server error.', error });
     }

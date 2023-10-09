@@ -13,6 +13,7 @@ router.post('/order', vidateuser, controller.placeOrder);
 
 router.delete('/cancel/:id', vidateuser, controller.cancelOrder);
 
+router.get('/order/agg', controller.getUserwithOrder);
 
 
 module.exports = router;

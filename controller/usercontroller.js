@@ -76,7 +76,7 @@ exports.createUser = async(req, res, next) => {
             email: req.body.email,
             password: req.body.password
         } 
-
+        
         const validate = await validateUser.validate(params);
         if(validate.error) {
             return next(new errorHandler("please enter valid credentials.", 400));
@@ -93,7 +93,7 @@ exports.createUser = async(req, res, next) => {
         params.password = hashedPassword; 
 
         const user = await User.create(params);
-        
+        console.log(process.env.JWT_SECRETE)
         const token = jwt.sign({_id: user._id}, process.env.JWT_SECRETE);
 
         res.status(201)
@@ -117,19 +117,21 @@ exports.updateUser = async(req, res, next) => {
             email: req.body.email,
             password: req.body.password
         }
-
+        
         const validate = await validateUser.validate(params);
         if(validate.error) {
             return next(new errorHandler("please enter valid credentials.", 400));
         }
-
+        
         const exist = await User.findOne({ email: params.email }).select("+password");
-
+        
         if(!exist) {
             return next(new errorHandler('user does not exists', 404));
         }
 
-        const user = await User.findByIdAndUpdate({ _id: exist._id });
+        const user = await User.findByIdAndUpdate({ _id: exist._id }, {$set: params}, { new: true });
+
+        const token = jwt.sign({_id: user._id}, process.env.JWT_SECRETE);
 
         res.status(200)
         .cookie("token", token, { 
@@ -147,16 +149,16 @@ exports.deleteuser = async(req, res, next) => {
     try {
 
         const id = req.params.id;
-
-        const user = await User.findById({ _id: mongoose.Types.ObjectId(id) });
-
+        
+        const user = await User.findById({_id :id});
+        
         if(!user) {
             return next(new errorHandler('user is does not exists', 404));
         }
-
-        await User.deleteOne(id);
-
-        res.status(200).send({ error: true, message: 'user is deleted successfully', error });
+        
+        const dele = await User.deleteOne({_id: id});
+       
+        res.status(200).send({ error: false, message: 'user is deleted successfully' });
     } catch (error) {
         res.status(500).send({ error: true, message: 'Internal server error', error });
     }
@@ -186,7 +188,9 @@ exports.login = async(req, res, next) => {
         //     return next(new errorHandler('does not match the password', 401));
         //     // res.send({error: true, message: 'does not match the password'});
         // }
-
+        // console.log('user:', user);
+        // const { passwords, ...otherDetails} = user;
+        // console.log('assss:', {...otherDetails});
         const token = jwt.sign({_id: user._id}, process.env.JWT_SECRETE);
 
         res.status(201).cookie("token", token, { 

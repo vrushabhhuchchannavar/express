@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Order = require('../models/order');
+const User = require('../models/userSchema');
 const Product = require('../models/product');
 const { getvalidate, getAllOrdersValidate } = require('../validation/productValidate')
 const errorHandler = require('../middleware/errorclass');
@@ -62,6 +63,7 @@ exports.getAllOrders = async(req, res) => {
         if(page<1) {
             return next(new errorHandler('page has to be greater than or equal to 1', 401));
         }
+
         const orders = await Order.find().skip(skipCount).limit(limit);
 
         res.status(201).send({ error: false, data: orders });
@@ -77,7 +79,8 @@ exports.placeOrder = async(req, res) => {
         const params = {
             name: req.body.name,
             mobile: req.body.mobile,
-            address: req.body.address
+            address: req.body.address,
+            custId: req.body.custId
         }
 
         const order = await Order.create(params);
@@ -111,3 +114,80 @@ exports.cancelOrder = async(req, res) => {
         res.status(500).send({ error: true, message: 'Internal server error', error });
     }
 }
+
+
+exports.getUserwithOrder = async(req, res, next) => {
+
+    try {
+
+        let name = req.query.name;
+        let mobile = req.query.mobile;
+        // let address = req.query.address;
+        // let value = req.query.name;
+        // console.log('name:', name)
+        // const exists = await Order.exists({ })
+        // let aggregate = [
+        //    { $match: { name: `${name}` } },
+        //    { $group: { _id: "$name",  }}
+        // ]
+// , time: "$SorederedAt"
+        // const aggregate = [ { $group: { _id: `${name}`, adresses: { $push: `${address}` } } } ];
+
+        // let aggregate = [{ 
+        //     $group: { _id: name, 
+        //     $orders: { $push: "$$ROOT" }}
+        // }]
+
+        // let query = { name: name }
+        // let aggregate = [
+        //     { $match: { name: `${name}` } },
+        //     // { $project: { mobile: 1, address: 1 } }
+        //     { $group: { _id: `${name}`, mobiles: { $sum: `${mobile}` } }}
+        // ]
+
+        // let aggregate = [{
+        //      $match: { name: name } },
+        //     { $lookup: {
+        //         from: "User",
+        //         localFeild: "mobile",
+        //         foreignFeild: "_id",
+        //         as: "users"
+        //     }}
+        // ]
+
+        // let aggregate = [{
+        //     $addFields: {
+        //         discounted_total: { $multiply: [2, 10] }
+        // }}]
+
+
+        // let aggregate = [{
+        //      $group: { _id: `${name}`, mobile: { $push: `${mobile}`} }
+        // }]
+
+        let aggregate = [{
+            // $match: { name: name },
+            $lookup: {
+                from: 'User',
+                localField: 'custId',
+                foreignField: '_id',
+                as: 'userOrders'
+            },
+            
+            // $project: {
+            //     userOrders: 1
+            // }
+        }]
+
+
+        console.log('aggregate:', aggregate)
+        const val = await Order.aggregate(aggregate);
+        console.log('values:', val);
+
+        res.status(201).send({ response: val });
+    } catch (error) {
+        console.log('its getting..')
+        res.status(500).send({ error: true, message: 'internal server error', error });
+    }
+
+} 

@@ -17,7 +17,7 @@ router.post('/user/reg', controller.createUser);
 
 router.patch('/user/update', controller.updateUser);
 
-router.delete('/user/delete', controller.deleteuser);
+router.delete('/user/delete/:id', controller.deleteuser);
 
 router.post('/user/login', controller.login);
 

@@ -17,17 +17,17 @@ exports.validateOrder = async(req, res, next) => {
 
         const decode = jwt.verify(token, process.env.JWT_SECRETE);
 
-        console.log(`deco:`, decode);
-        console.log(`decoID:`, decode._id);
+        // console.log(`deco:`, decode);
+        // console.log(`decoID:`, decode._id);
         // req.Orders = await Order.find(id);
 
         const response = await Order.findById(decode._id);
-        console.log(`response:`, response);
+        // console.log(`response:`, response);
         req.orders = response;
-        console.log(`ord:`, req.order);
+        // console.log(`ord:`, req.order);
         next();
 
-    } catch (err) {
-        res.status(500).send({ error: true, message: 'Internal server error'});
+    } catch (error) {
+        res.status(500).send({ error: true, message: 'Internal server error', error });
     }
 }
