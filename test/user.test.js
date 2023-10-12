@@ -97,14 +97,14 @@ describe('tsets', () => {
     describe('Update User Credentials', () => {
         it('it should update the user', async() =>{
             const randomValues = getRandomValues();
-
             await createdUser({
                 name: randomValues.string,
                 email: randomValues.email,
                 password: randomValues.password
             });
-
+            
             const updateuserDto = getRandomValues();
+            // console.log(updateuserDto)
             const response = await request(MAINAPI_URL)
             .patch(`/api/v1/user/update`)
             .send({
@@ -112,12 +112,12 @@ describe('tsets', () => {
                 email: randomValues.email,
                 password: updateuserDto.password
             });
-    
+            // console.log(response.body);
             expect(response.statusCode).toBe(200);
             expect(response.body).toBeDefined();
             expect(response.body.result).toBeDefined();
             expect(response.body.result.name == updateuserDto.string).toBeTruthy();
-            expect(response.body.result.name == updateuserDto.password).toBeTruthy();
+            expect(response.body.result.password == updateuserDto.password).toBeTruthy();
         });
 
         it('it should fail if user is does not exists', async() => {

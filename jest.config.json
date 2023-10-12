@@ -1,0 +1,10 @@
+
+
+{
+"reporters": [
+  "default",
+  ["./node_modules/jest-html-reporters", {
+      "pageTitle": "Test Report"
+  }]
+]
+}

@@ -20,7 +20,7 @@ exports.createAdmin = async(req, res, next) => {
             password: req.body.password
         }
         
-        // console.log(params);
+        console.log(params);
         // const adminPayload = {
         //     name: process.env.NAME,
         //     email: process.env.EMAIL,
