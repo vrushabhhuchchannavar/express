@@ -1,0 +1,29 @@
+image: node:14  # You can choose a different Node.js version if needed
+
+pipelines:
+  default:
+  branches:
+  testing:
+    - step:
+        name: Run Tests
+        caches:
+          - node
+        script:
+          - npm install  # Install your project dependencies
+          - npm test     # Run your tests
+
+definitions:
+  steps:
+    - step: &check-tests
+        name: Check Test Results
+        caches:
+          - node
+        script:
+          - node nodeshowtestresult.js  # Run your testresult.js file to get the test results
+          - |
+            if [ $FAILED_TEST_CASES -gt 1 ]; then
+              echo "Stopping the pipeline due to more than 1 failed test cases."
+              exit 1
+            fi
+        services:
+          - node
