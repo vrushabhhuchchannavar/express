@@ -2,8 +2,6 @@ image: node:14  # You can choose a different Node.js version if needed
 
 pipelines:
   default:
-  branches:
-  testing:
     - step:
         name: Run Tests
         caches:
