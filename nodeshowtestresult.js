@@ -1,6 +1,4 @@
-
 const fs = require('fs');
-
 
 const jsContent = fs.readFileSync('./jest-html-reporters-attach/jest_html_reporters/result.js', 'utf8');
 
@@ -8,39 +6,35 @@ const jsContent = fs.readFileSync('./jest-html-reporters-attach/jest_html_report
 const jsonStart = jsContent.indexOf('{');
 const jsonEnd = jsContent.lastIndexOf('}') + 1;
 const jsonData = jsContent.substring(jsonStart, jsonEnd);
+console.log('jsonData:', jsonData)
 
-
-// Parse the JSON data
+const testResults = () => {
+  // Parse the JSON data
 try {
   const parsedData = JSON.parse(jsonData);
-//   console.log('parsedData:', parsedData)
-
-  let resultArray = parsedData.testResults[0];
-    // console.log('resultArray:', resultArray)
-
-    const perfStats = resultArray.perfStats;
-
+  console.log('parsedData:', parsedData)
+  
     let testResult = {
-        passedTestCases: resultArray.numPassingTests,
-        failedTestCases: resultArray.numFailingTests,
-        pendingTestCases: resultArray.numPendingTests,
-        performanceStats: perfStats
+        passedTestCases: parsedData.numPassedTests,
+        failedTestCases: parsedData.numFailedTests,
+        pendingTestCases: parsedData.numPendingTests,
+        // performanceStats: perfStats
     }
  
-  console.log("testResultResponses:", testResult)
+    return testResult;
+  // console.log("testResultResponses:", testResult)
 
 } catch (error) {
   console.error('Error parsing JSON data:', error);
 }
+};
+
+const testRes = testResults();
+console.log('jjj:', testRes);
+console.log(`export FAILED_TEST_CASES=${testRes.failedTestCases}`);
 
 
-
-let text = "Hello world, welcome to the universe.";
-document.getElementById("demo").innerHTML = text.indexOf("e", 5);;
-
-
-
-
+module.exports = { testResults };
 
 
 
