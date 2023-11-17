@@ -6,7 +6,10 @@ const jsContent = fs.readFileSync('./jest-html-reporters-attach/jest_html_report
 
 // Extract the JSON data
 const jsonStart = jsContent.indexOf('{');
+const jsonEndl = jsContent.lastIndexOf('}');
+console.log(jsonEndl);
 const jsonEnd = jsContent.lastIndexOf('}') + 1;
+console.log(jsonEnd);
 const jsonData = jsContent.substring(jsonStart, jsonEnd);
 
 
@@ -33,10 +36,6 @@ try {
   console.error('Error parsing JSON data:', error);
 }
 
-
-
-let text = "Hello world, welcome to the universe.";
-document.getElementById("demo").innerHTML = text.indexOf("e", 5);;
 
 
 
