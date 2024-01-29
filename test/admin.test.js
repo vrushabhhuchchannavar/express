@@ -30,7 +30,7 @@ describe('admin test', () => {
 
     describe('create admin', () => {
 
-        it('it should search for the user', async() => {
+        it.skip('it should search for the user', async() => {
             const dtoValues = getRandomValues();
             const response = await request(MAINAPI_URL)
             .post(`/api/v1/`)

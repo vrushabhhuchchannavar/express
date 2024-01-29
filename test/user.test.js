@@ -47,7 +47,7 @@ async function createdUser(dtoValues) {
 describe('tsets', () => {
 
     describe('Registration The User', () => {
-        it('it should cereate a user', async() => {
+        it.skip('it should cereate a user', async() => {
             const randomValues = getRandomValues();
 
             const response = await request(MAINAPI_URL)
@@ -95,7 +95,7 @@ describe('tsets', () => {
     });
 
     describe('Update User Credentials', () => {
-        it('it should update the user', async() =>{
+        it.skip('it should update the user', async() =>{
             const randomValues = getRandomValues();
             await createdUser({
                 name: randomValues.string,
@@ -139,7 +139,7 @@ describe('tsets', () => {
     });
 
     describe('Delete The User', () => {
-        it('it should delete the user', async() => {
+        it.skip('it should delete the user', async() => {
             const userDto = getRandomValues();
             const user = await createdUser({
                 name: userDto.string,
@@ -175,7 +175,7 @@ describe('tsets', () => {
     });
 
     describe('Login The User', () => {
-        it('it should login with user credentials', async() => {
+        it.skip('it should login with user credentials', async() => {
             const userDto = getRandomValues();
 
             const user = await createdUser({

@@ -17,8 +17,9 @@ const app = express();
 
 const apiVersion = `/api/v1`;
 
-mongoose.connect(process.env.MONGO_URI, {
-    dbName: "backend",
+mongoose.connect("mongodb+srv://vrushabh:vru1008@dev-vrushabh.t1isxps.mongodb.net/backend", {
+    useNewUrlParser: true,
+  useUnifiedTopology: true,
 }).then(() => console.log("db is connected successfully."))
 .catch((e) => console.log(e));
 
@@ -28,11 +29,11 @@ mongoose.connect(process.env.MONGO_URI, {
 // app.use(bodyParser.json());
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-    origin: [process.env.FRONTEND_URL],
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    credentials: true
-}));
+// app.use(cors({
+//     origin: [process.env.FRONTEND_URL],
+//     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+//     credentials: true
+// }));
 // app.use(bodyParser.urlencoded({extended: false}));
 
 
@@ -46,8 +47,8 @@ app.use(apiVersion, orderRouter);
 app.use(middleWare);
 
 
-app.listen(process.env.PORT, () => {
-    console.log(`server is running successfully.`)
+app.listen(5000, () => {
+    console.log(`server is running successfully. ${5000}`)
 });
 
 
