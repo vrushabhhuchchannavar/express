@@ -4,7 +4,10 @@ const jsContent = fs.readFileSync('./jest-html-reporters-attach/jest_html_report
 
 // Extract the JSON data
 const jsonStart = jsContent.indexOf('{');
+const jsonEndl = jsContent.lastIndexOf('}');
+console.log(jsonEndl);
 const jsonEnd = jsContent.lastIndexOf('}') + 1;
+console.log(jsonEnd);
 const jsonData = jsContent.substring(jsonStart, jsonEnd);
 console.log('jsonData:', jsonData)
 
@@ -34,7 +37,9 @@ console.log('jjj:', testRes);
 console.log(`export FAILED_TEST_CASES=${testRes.failedTestCases}`);
 
 
-module.exports = { testResults };
+
+
+
 
 
 

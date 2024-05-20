@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+
+  express:
+    image: express
+    build: .
+    ports:
+      - "5000:5000"
