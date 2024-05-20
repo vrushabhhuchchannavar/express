@@ -51,9 +51,9 @@ exports.createAdmin = async(req, res, next) => {
         
         const admin = await Admin.create(params);
 
-        const token = jwt.sign({_id: admin._id}, process.env.JWT_SECRETE);
+        const token = jwt.sign({_id: admin._id}, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9');
 
-        res.status(201).cookie("token", token, { 
+        res.status(201).cookie("token", token, {    
             httpOnly: true, 
             maxAge: 15 * 60 * 1000, }).send({ error: false, message: 'admin created successfully.'});
 
