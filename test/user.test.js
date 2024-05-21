@@ -47,7 +47,7 @@ async function createdUser(dtoValues) {
 describe('tsets', () => {
 
     describe('Registration The User', () => {
-        it.skip('it should cereate a user', async() => {
+        it('it should cereate a user', async() => {
             const randomValues = getRandomValues();
 
             const response = await request(MAINAPI_URL)
