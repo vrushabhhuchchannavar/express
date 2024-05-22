@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest --runInBand --detectOpenHandles",
-    "start": "nodemon index.js"
+    "start-server": "nodemon index.js",
+    "stop-server": "pkill -f \"nodemon.*index.js\"",
+    "test": "concurrently \"npm run start-server\" \"npm test\" \"npm run stop-server\""
   },
   "repository": {
     "type": "git",
@@ -39,5 +40,8 @@
   "directories": {
     "test": "test"
   },
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
 }
