@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --runInBand --detectOpenHandles",
-    "start": "index.js"
+    "start": "nodemon index.js"
   },
   "repository": {
     "type": "git",
