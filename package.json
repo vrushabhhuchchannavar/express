@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --runInBand --detectOpenHandles",
-    "start": "nodemon index.js"
-  },
+  "start-server": "nodemon index.js",
+  "stop-server": "pkill -f \"nodemon.*index.js\"",
+  "test": "concurrently \"npm run start-server\" \"npm test\" \"npm run stop-server\""
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vrushabhhuchchannavar/express.git"
