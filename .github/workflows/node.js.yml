@@ -8,17 +8,14 @@ on:
     branches: [ "main" ]
   push:
     branches: [ "main" ]
-  
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         node-version: [18.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - uses: actions/checkout@v2
@@ -26,6 +23,7 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '14'
-    - run: npm install    
+    - run: npm install
     - run: npm ci
+    - run: npm install --save-dev concurrently
     - run: npm test
