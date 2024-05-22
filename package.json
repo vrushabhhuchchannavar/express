@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start-server": "nodemon index.js",
-    "stop-server": "pkill -f \"nodemon.*index.js\"",
-    "test": "concurrently \"npm run start-server\" \"npm test\" \"npm run stop-server\""
+    "test": "jest --runInBand --detectOpenHandles",
+    "start": "nodemon index.js"
   },
   "repository": {
     "type": "git",
