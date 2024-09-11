@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 
 const errorHandler = require('../middleware/errorclass');
 const User = require('../models/userSchema');
+const Admin = require('../models/admin');
 const { validateUser, validatelogin, getAllusersValidate } = require('../validation/uservalidation');
 
 // exports.getAll = async(req, res) => {
@@ -49,7 +50,7 @@ exports.getAllUsers = async(req, res, next) => {
         let page = req.query.page;
         let limit = req.query.limit;
         let skipCount = (page-1) * limit;
-        
+        console.log('>>>>>>>>>>>>>>>>>>')
         const validate = await getAllusersValidate.validate({page, limit});
         
         if (validate.error) {
@@ -61,8 +62,14 @@ exports.getAllUsers = async(req, res, next) => {
         }
          
         const users = await User.find().skip(skipCount).limit(limit);
+        console.log("users>>>", users)
+
+        // const user = await Admin.create(params);
+        // console.log(process.env.JWT_SECRETE)
+        // const token = jwt.sign({_id: user._id}, process.env.JWT_SECRETE);
         
-        res.status(200).send({ error: false, message: 'these are the users.', result: users });
+        res.status(200)
+            .send({ error: false, message: 'these are the users.', result: users });
     } catch (error) {
         res.status(500).send({ error: true, message: 'Internal server error.', error });
     }
@@ -82,11 +89,11 @@ exports.createUser = async(req, res, next) => {
             return next(new errorHandler("please enter valid credentials.", 400));
         }
         
-        let existUser = await User.findOne({ email: params.email });
-        if(existUser) {
-            return next(new errorHandler("user already exists.", 400));
-            // res.status(401).send({ error: true, message: 'user alresdy exists' })
-        }
+        // let existUser = await User.findOne({ email: params.email });
+        // if(existUser) {
+        //     return next(new errorHandler("user already exists.", 400));
+        //     // res.status(401).send({ error: true, message: 'user alresdy exists' })
+        // }
        
         
         let hashedPassword = await bcrypt.hash(params.password, 10);
@@ -95,6 +102,7 @@ exports.createUser = async(req, res, next) => {
         const user = await User.create(params);
         console.log(process.env.JWT_SECRETE)
         const token = jwt.sign({_id: user._id}, process.env.JWT_SECRETE);
+        console.log('token', token)
 
         res.status(201)
         .cookie("token", token, { 

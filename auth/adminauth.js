@@ -5,7 +5,7 @@ exports.adminValidation = async(req, res, next) => {
 
     try {
         const { token } = req.cookies;
-       
+       console.log('token>>>', token)
         if(!token) {
             res.status(403).send({ errro: true, message: 'Authentication failed.'});
         }

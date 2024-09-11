@@ -1,0 +1,46 @@
+
+# config:
+#   target: 'https://test.ecobillz.com/api'
+#   phases:
+#     - duration: 1
+#       arrivalRate: 379
+#       name: increased 300 load requests   
+# scenarios:
+#   - flow:
+#       - get:
+#           url: '/terminal/v2/settings'
+#           qs: 
+#             outletId: 5399f44b9e4f689450221e3a
+#           headers:
+#             authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoiSmo5YmNMcnY5NWRpUjRCQloiLCJzZXNzaW9uSWQiOiJlMzA1NzE0ZS1mNDA3LTRhMWYtOWUyNS1mMmRiYjBkNzFmODAiLCJ0eXBlIjoiZG1zIiwic3RhdHVzIjp0cnVlfSwiaWF0IjoxNzE5OTE5Mjg5fQ.ycFRGjrbMZ9jo1SysTKIfJLo1OfU1NREiYpIZzRlLFU'
+          
+
+        
+# 
+# https://test.ecobillz.com/api/settings/email/v1/settings?outletId=5399f44b9e4f689450221e3a
+# 379 is the maximum pipesize for every second
+
+
+
+
+config:
+  target: 'https://test.ecobillz.com/api'
+  phases:
+    # - duration: 10
+    #   arrivalRate: 50
+    #   name: increased 50 load requests   
+    - duration: 10
+      arrivalRate: 100
+      name: increased 100 requests 
+    - duration: 10
+      arrivalRate: 120
+      name: increased 120 requests    
+scenarios:
+  - flow:
+      - get:
+          url: '/terminal/v2/settings'
+          qs: 
+            outletId: 5399f44b9e4f689450221e3a
+          headers:
+            authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoiSmo5YmNMcnY5NWRpUjRCQloiLCJzZXNzaW9uSWQiOiI2ZjY4MTQ1Zi0wNDg3LTQyOTgtOTM0My1jZDdjY2ZiMGIxMDkiLCJ0eXBlIjoiZG1zIiwic3RhdHVzIjp0cnVlfSwiaWF0IjoxNzIwMDEwMTcwfQ._xtu91MOeu_Achz5wzV3OHQHsN_4r6WdtilNeps8AOs'
+          
